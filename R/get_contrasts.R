@@ -22,6 +22,9 @@ get_contrasts <- function(model,
     setDF(hi)
     setDF(original)
 
+    # jacobian is not always computed here
+    J <- NULL
+
     # brms models need to be combined to use a single seed when sample_new_levels="gaussian"
     if (inherits(model, "brmsfit")) {
         both <- rbindlist(list(lo, hi))
@@ -53,6 +56,15 @@ get_contrasts <- function(model,
             vcov = FALSE,
             newdata = hi,
             ...))[["value"]]
+
+        # when this works, it is MUCH faster than differentiation
+        mi <- insight::model_info(model)
+        if (isTRUE(mi$is_linear)) {
+            J <- hush(
+                insight::get_modelmatrix(model, data = hi) - insight::get_modelmatrix(model, data = lo)
+            )
+        }
+
     }
 
     pred_or <- myTryCatch(get_predict(
@@ -328,5 +340,6 @@ get_contrasts <- function(model,
     # output
     attr(out, "posterior_draws") <- draws
     attr(out, "original") <- original
+    attr(out, "jacobian_linear") <- J
     return(out)
 }

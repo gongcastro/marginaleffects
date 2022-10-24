@@ -95,7 +95,7 @@ get_se_delta <- function(model,
         return(g)
     }
 
-    if (is.null(J) || !is.null(hypothesis)) {
+    if (is.null(J) || !is.null(hypothesis) || ncol(J) != ncol(vcov)) {
         args <- list(
             func = inner,
             x = coefs)

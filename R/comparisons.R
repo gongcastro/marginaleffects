@@ -370,6 +370,7 @@ comparisons <- function(model,
                      lo = contrast_data$lo,
                      original = contrast_data$original,
                      by = by,
+                     J = attr(mfx, "jacobian_linear"),
                      interaction = interaction,
                      eps = 1e-4)
         args <- c(args, dots)
